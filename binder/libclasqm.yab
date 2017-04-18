@@ -38,7 +38,7 @@ export sub FileExists(fullpathname$)
 #################################################
 	local handle
 	handle = open(fullpathname$,"r")
-	if handle
+	if handle then
 		return 1
 	else
 		return 0
