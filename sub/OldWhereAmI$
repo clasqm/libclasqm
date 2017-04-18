@@ -1,0 +1,16 @@
+#################################################
+export sub OldWhereAmI$()
+//works with older versions of yab, or use as fallback
+#################################################
+	local path$, catch, x
+	catch=0
+	if (peek("isbound")) then
+  		path$=peek$("directory")
+	else
+		path$=system$("pwd")
+	endif
+	 path$ = StripLFoffSysCmd$(path$)
+	 // I prefer not to add the trailing slash at this point
+	return path$
+end sub
+

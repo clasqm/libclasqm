@@ -1,0 +1,238 @@
+//This library dates back to the yabasic era.
+//It is provided here as  a service, but is untested on yab
+
+//Installation: create the directory /boot/home/config/settings/yab and copy or symlink
+//the library there.
+
+doc Library image.yab, routines for handling images in several formats
+doc programmed by Hermang Hialino Mansilla Mattos, hh_mm@yahoo.com
+doc last modified on May 30, 2006
+doc graphic formats supported:  8bit pcx, bmp and 24bit bmp
+doc it detects the format based on the filename extension or file's header
+doc Useful routines:
+doc err=GetImage( index , filename$  )
+doc DrawImage( index , dx,dy )
+doc from the main program you can change the variable image.Path$
+
+rem import gif
+
+rem ==========================================
+
+Path$=""  : rem path from where to load images
+
+Error$=""
+ValidExt$="bmp,pcx,lss,gif,bin"  : rem soon gif, jpg, xbm. xpm
+
+mp=32
+Dim Filename$(mp), Ext$(mp)
+Dim Widths(mp),Heights(mp), bpps(mp)
+Dim Offsets(mp)
+
+Offset=0
+Width=0
+Height=0
+bpp=0
+Error$=""
+
+Dim Palette(256*4)
+
+
+
+
+sub GetExt$(filename$)
+local r$, i
+r$= right$(filename$,5)
+i=instr(r$,".")
+if i>0 then
+  return lower$(right$(r$,5-i))
+else
+  return ""
+end if
+end sub
+
+
+Export sub GetImage(index, filename$)
+local fp, ext$
+ if index<0 and index>mp then
+   Error$="invalid index"
+   return -1
+ end if
+
+fp=open( Path$+filename$ , "rb" )
+ if fp<1 then
+    Error$="File "+filename$+" Does not Exist in path "+Path$
+    return -1
+ end if
+
+Filename$(index)=Path$+filename$
+  ext$=GetExt$(filename$)
+ rem check if file extention is supported
+ rem Work in progress ...
+ rem if instr(ValidExt$,ext$) ...
+ Ext$(index)=ext$
+ rem grab Width,height, bpp : w.i.p.
+ rem if ext$="bmp" ReadHeader() ...
+close(fp)
+end sub
+
+
+
+Export sub DisplayImage(index, dx , dy)
+rem only bmps for now
+if Ext$(index)="bmp" DrawBMP(Filename$(index),dx,dy)
+if Ext$(index)="pcx" DrawPCX(Filename$(index),dx,dy)
+rem Work in Progress :
+if Ext$(index)="lss" DrawLSS(Filename$(index),dx,dy)
+if Ext$(index)="gif" DrawGIF(Filename$(index),dx,dy)
+end sub
+
+
+Export sub DrawImage(fn$, dx , dy)
+tmp=GetImage(0,fn$)
+DisplayImage(0, dx , dy)
+end sub
+
+
+
+Sub Report()
+? "ImageWidth  = " , Width
+? "ImageHeight = " , Height
+? "BitsPerPixel=" , bpp
+? "ImageOffset = " , Offset
+rem ? "FileSize    = " , FileSize
+? "Last Error  = ", Error$
+End Sub
+
+
+export sub DrawBMP( bmpfile$, dx,dy )
+local fp, k, row,col, byte, blue, green
+Error$=""
+fp=open(bmpfile$,"rb")
+if fp<1 then
+    Error$="File "+bmpfile$+" Does not Exist"
+    return -1
+end if
+    rem seek #fp,2
+    rem FileSize=peek(fp)+256*peek(fp)+65536*(peek(fp)+256*peek(fp))
+seek #fp,10 : Offset=peek(fp)+256*peek(fp)
+seek #fp,18 : Width=peek(fp)+256*peek(fp)
+seek #fp,22 : Height=peek(fp)+256*peek(fp)
+seek #fp,28 
+bpp=peek(fp) 
+
+IF bpp=8 THEN
+rem Read the Color Palette of 8bit BMP file already opened
+rem  loads color values and stores them in Palette()
+rem  values start at byte 55 in the file. Four bytes are stored
+rem  for each color, three for the blue, green and red values
+rem  and one which is not used.
+seek #fp,55-1
+for c=0 to 1023
+  Palette(c)=peek(fp)
+next c
+
+  seek #fp,Offset
+  for row = 1 to Height
+    FOR col = 1 to Width
+        byte=4*peek(fp)
+        color Palette(byte+2),Palette(byte+1),Palette(byte)
+        dot dx+col,dy+Height+1-row
+    NEXT col
+  rem adjust extra bytes
+  c=Width
+  while(mod(c,4)<>0)
+   tmp=peek(fp)
+   c=c+1
+  wend
+  next row
+
+ELSIF bpp=24 THEN
+  seek #fp,54
+  for row = 1 to Height
+    FOR col = 1 to Width
+        blue=peek(fp)
+        green=peek(fp)
+        color peek(fp),green,blue
+        dot dx+col,dy+Height+1-row
+    NEXT col
+  rem adjust extra bytes
+c=Width*3
+while(mod(c,4)<>0)
+ tmp=peek(fp)
+ c=c+1
+wend
+  next row
+
+END IF
+close fp
+end sub
+
+
+Export Sub DrawPCX(pcxfile$, dx, dy )
+local fp, i,  flength
+local  x,y, idx, pix,rle, debug
+
+ fp=open(pcxfile$,"rb")
+ seek #fp, 8
+Width=peek(fp)+256*peek(fp)
+Height=peek(fp)+256*peek(fp)
+REM ************ GO TO END TO CHECK FILESIZE AND READ PALETTE *******
+  seek #fp, 0, "end"
+  flength=tell(#fp)
+  seek #fp, -768 ,"end"
+for i=0 to 767
+Palette(i)=peek(#fp)
+next i
+
+REM ************ READ Run Length Encoded Pixel Data ********
+seek #fp, 128
+
+rem for i=0 to flength-128-768
+rem rle(i)=peek(#fp)
+rem next i
+
+idx=0
+for y=0 to Height
+x=0
+while(x<= Width)
+	pix=peek(#fp)
+	if pix>192 then
+            rle=pix-192
+	    pix=3*peek(#fp)
+	    color Palette(pix), Palette(pix+1),Palette(pix+2)
+	    if x+rle>Width+1 then
+		line dx+x,dy+y to dx+Width, dy+y
+		y=y+1
+		x=x+rle-Width-1
+		line dx,dy+y to dx+x,dy+y
+	    else
+		line dx+x,dy+y to dx+x+rle,dy+y
+		x=x+rle
+	    end if
+	else
+          color Palette(3*pix), Palette(3*pix+1),Palette(3*pix+2)
+	  dot dx+x,dy+y
+	  x=x+1
+    	end if
+wend
+next y
+
+ close(fp)
+
+End Sub  : rem DrawPCX()
+
+
+rem ========================================
+
+sub DrawGIF()
+rem  not ready yet !
+end sub
+
+sub DrawLSS()
+rem  not ready yet !
+end sub
+
+
+
+
+

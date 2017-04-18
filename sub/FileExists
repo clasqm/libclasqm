@@ -1,0 +1,16 @@
+#################################################
+export sub FileExists(fullpathname$)
+//test if a file exists
+//returns 1 - file exists
+//returns 0 - file does not exist
+#################################################
+	local handle
+	handle = open(fullpathname$,"r")
+	if handle
+		return 1
+	else
+		return 0
+	endif
+	close handle
+end sub
+

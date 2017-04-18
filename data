@@ -1,0 +1,62 @@
+########################################
+#Library Test suite for libclasqm_main
+#past the lines below into a new yab file and remove the 
+//remarks to test these routines.
+########################################
+
+//#!/bin/env yab
+//import libclasqm_main
+//system("clear")
+//
+//print "Testing FileExists."
+//if (FileExists("/boot/home/projects/libclasqm/binder/libclasqm.yab")) then
+//	print "Yes, that file is on your system."
+//else
+//	print"Sorry, bub, that file is not found."
+//endif
+//print
+//print "Testing HPKGStatus."
+//if HPKGStatus() = 1 then
+//	print "Running from system, are we?"
+//elseif HPKGStatus() = 2 then
+//	print "Oooh, running from the home folder!"
+//else
+//	print "Go ahead and package this sucker!"
+//endif
+//print
+//print "Testing WhereAmI$ and OldWhereAmI$."
+//print "the working directory is " + WhereAmI$() + "."
+//print "or as we used to calculate it, " + OldWhereAmI$() + "."
+//print
+//print "Testing RandInt."
+//Print "Here's a large random number: " + str$(RandInt()) + "."
+//print
+//print "Testing RandInt0To9."
+//Print "Here's a small random number: " + str$(RandInt0To9()) + "."
+//print
+//print "Testing StripLFoffSysCmd$"
+//print "The yab executable is located at " + StripLFoffSysCmd$(system$("which yab")) + ". Note that we've removed the line feed."
+//print
+//print "Testing TempDir$"
+//Print " The TMP directory is at " + TempDir$() + "."
+//print "testing FileorDir, FileorLink and IsFileZeroByte"
+//a$ = "/boot/system/non-packaged"
+//#change this variable to something else to test different kinds of files
+//#links and directories
+//print "using " + a$
+//if (FileorDir(a$)) then
+//	print "It's a directory!"
+//else
+//	print "it looks like a file ..."
+//endif 
+//if not (FileorLink(a$)) then
+//	print "and it looks real, not a symbolic link."
+//else
+//	print "it's a link!"
+//endif
+//if (IsFileZeroByte(a$)) then
+//	print "it is larger than zero bytes"
+//else
+//	print "it is a zero-byte file"
+//endif
+

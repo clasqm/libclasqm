@@ -1,0 +1,13 @@
+#################################################
+export sub TempDir$()
+//returns the location of Haiku's TMP directory
+//note: no traling "/"
+//The Haiku devs are fond of moving this location around, so you shouldn't
+//reference it directly, rather use this routine
+#################################################
+	local tempdir$
+	tempdir$ = system$("finddir B_COMMON_TEMP_DIRECTORY") 
+	tempdir$ = StripLFoffSysCmd$(tempdir$) //strip off trailing newline
+	return tempdir$
+end sub
+

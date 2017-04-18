@@ -1,0 +1,13 @@
+#!/bin/sh
+## who am i? ##
+_script="$(readlink -f ${BASH_SOURCE[0]})"
+ 
+## Delete last component from $_script ##
+_base="$(dirname $_script)"
+cd $_base
+
+cd ../../lib
+
+mkdir -p /boot/home/config/settings/yab
+ln -s -f -r libclasqm_main.yab /boot/home/config/settings/yab/libclasqm_main.yab
+ln -s -f -r libclasqm_compat.yab /boot/home/config/settings/yab/libclasqm_compat.yab

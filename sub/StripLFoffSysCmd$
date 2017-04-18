@@ -1,0 +1,12 @@
+#################################################
+export sub StripLFoffSysCmd$(tempval$)
+//remove LF from the results of a system call
+//if the results of a System() or System$() command end on a LF (most do),
+//strip the LF off and return the resulting string
+#################################################
+	if instr(tempval$, "\n", len(tempval$)) <> 0 then //if the string ends with a LF
+		tempval$ = left$(tempval$, len(tempval$)-1) //strip off trailing newline
+	endif
+	return tempval$
+end sub
+

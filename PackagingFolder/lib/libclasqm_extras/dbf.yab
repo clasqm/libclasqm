@@ -1,0 +1,210 @@
+print "Dbase III Viewer version 0.5"
+gosub Initialize
+dim dBase(37000)
+gosub ReadWholeDBase
+gosub ReadDbfHdr
+if ActionHdr=1 then
+  beep:print "Not a Dbase III File ! ..."
+else
+clear screen
+  gosub DspDbfInfo
+  gosub ReadFileStructure 
+  if ActionFile=TRUE then
+       gosub DspFileStructure
+       if ActioHdr <>2 then
+          gosub ImprimeReporte
+       else
+          print "No Records to print"
+       fi
+  else beep
+       print "Field Information Error"
+  fi
+fi
+close 1
+end :rem Final
+
+
+label Initialize
+TRUE=-1:FALSE=0
+tapiz$=" "
+if peek("argument")<1 then 
+FileName$="database.dbf"
+else FileName$=peek$("argument")
+fi
+MaxNumberFields=12
+  dim FdName$(MaxNumberFields), FdType$(MaxNumberFields)
+  dim FdLength(MaxNumberFields), FdDec(MaxNumberFields)
+return:rem Initialize
+
+label ReadWholeDBase
+open 1,FileName$,"rb"
+posrel=1
+label keepreading
+byteval=peek("#1")
+dBase(posrel)=byteval
+posrel=posrel+1
+if (not eof(1)) then
+goto keepreading
+fi
+dbasesize=posrel-1
+print dbasesize
+close 1
+return
+
+
+label BorraFrame
+rem fills area from posx,poy to +sizx,+sizy with tapiz$
+linea$=""
+for i=1 to sizx
+linea$=linea$+tapiz$
+next i
+for j=1 to sizy
+print @(posx+i-1,posy+j-1) linea$;
+next j
+return :rem BorraFrame
+
+
+label ReadDbfHdr
+numdata=7
+dim etiqueta$(numdata),valor(12)
+data 1,"dBase Version",1
+data 2,"Year",1
+data 3,"Month",1
+data 4,"Day",1
+data 5,"NumberRecords",4
+data 9,"HeaderLength",2
+data 11,"RecordLength",2
+for i=1 to numdata
+read pos,etiqueta$(i),bytes
+next i
+for pos=1 to 12
+valor(pos)=dBase(pos)
+next pos
+VersionNumber=valor(1)
+HeaderLength=valor(10)*256+valor(9)
+NumberRecords=valor(7)*65535+valor(6)*256+valor(5)
+RecordLength=valor(12)*256+valor(11)
+
+NumberFields=(HeaderLength-33)/32
+FileSize=HeaderLength+RecordLength*NumberRecords+1
+if VersionNumber<>3 then ActionHdr=1
+else 
+if NumberRecords=0 then ActionHdr=2
+else
+    ActionHdr=0
+fi
+fi
+return :rem ReadDbfHdr
+
+
+label DspDbfInfo
+colu=1
+for i=1 to 4
+print @(colu,1+i) etiqueta$(i)," = ",valor(i)
+next i
+print @(colu,6) "NumberRecords=",NumberRecords
+print @(colu,7) "HeaderLength=",HeaderLength
+print @(colu,8) "RecordLength=",RecordLength
+
+print @(colu,9) "NumberFields= ",NumberFields
+print @(colu,10) "FileSize= ",FileSize
+return: rem DspDbfInfo
+
+
+label ReadFileStructure
+posrel=33
+for i=1 to NumberFields
+rem Name of Field
+pos=posrel
+FdName$(i)=""
+for j=1 to 10
+byteval=dBase(pos)
+FdName$(i)=FdName$(i)+chr$(byteval)
+pos=pos+1
+next j
+rem Type of Data
+pos=posrel+11
+byteval=dBase(pos)
+FdType$(i)=chr$(byteval)
+rem Length
+pos=posrel+16
+byteval=dBase(pos)
+FdLength(i)=asc( chr$(byteval) )
+rem Decimal
+pos=posrel+17
+byteval=dBase(pos)
+FdDec(i)=asc( chr$(byteval) )
+posrel=posrel+32
+next i
+rem pos=pos+1
+rem if (byteval=13) then ActioFile=-1
+rem else ActioFile=0
+rem fi
+ActionFile=-1
+return :rem ReadFileStructure
+
+
+label DspFileStructure
+colu=30
+fila=2
+print @(colu,fila) " Field#  FieldName   Type  Length Dec";
+for i=1 to NumberFields
+print @(colu+3,fila+i) str$(i,"%1.0f");
+print @(colu+9,fila+i) FdName$(i);
+print @(colu+22,fila+i) FdType$(i);
+print @(colu+27,fila+i) str$(FdLength(i),"%3.0f");
+print @(colu+34,fila+i) FdDec(i);
+next i
+print @(colu+20,1+fila+NumberFields) "Total =",RecordLength
+return: rem DspFileStructure
+
+label ImprimeReporte
+dim FieldValues$(NumberFields)
+colu=1:fila=12
+print @(colu,fila) "Report of File : ",FileName$;
+record=1
+gosub ReadDbfRecord
+LABEL recordlazo
+print @(colu,fila+1) "Record #",str$(record,"%2.0f")," of ",NumberRecords;
+gosub PrintDbfRecord
+if record<NumberRecords then
+record=record+1
+else record=1
+fi
+gosub ReadDbfRecord
+k$=inkey$(1)
+if k$="q" then end fi
+if k$="left" then 
+  if record>2 then
+  record=record-2
+  gosub ReadDbfRecord
+  fi
+fi
+posx=colu:posy=fila
+sizx=78-posx
+sizy=NumberFields+2
+gosub BorraFrame
+goto recordlazo
+return: rem ImprimeReporte
+
+label ReadDbfRecord
+posrel=HeaderLength+2+(record-1)*RecordLength
+pos=posrel
+for i=1 to NumberFields
+FieldValues$(i)=""
+for j=1 to FdLength(i)
+byteval=dBase(pos)
+FieldValues$(i)=FieldValues$(i)+chr$(byteval)
+pos=pos+1
+next j
+next i
+return
+
+label PrintDbfRecord
+for i=1 to NumberFields
+print @(colu,fila+1+i) FdName$(i);
+print reverse @(col+14,fila+1+i) FieldValues$(i);
+next i
+return
+
+

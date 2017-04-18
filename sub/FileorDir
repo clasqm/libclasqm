@@ -1,0 +1,18 @@
+#################################################
+export sub FileorDir(pathname$)
+#determines if a passed filename is a file or a directory
+#returns 1 if the passed variable is a directory
+#returns 0 if it is a file
+#################################################
+	local isadir
+	isadir = not system("test -d '" + pathname$ + "'")
+	switch isadir
+		case 1
+			return isadir
+			break
+		default
+			return 0
+			break
+		end switch
+end sub
+

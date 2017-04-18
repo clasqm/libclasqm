@@ -1,0 +1,22 @@
+#################################################
+export sub HPKGStatus()
+//report app's status in the Haiku packaging system
+//returns 1 - hpkg is installed in /boot/system/packages
+//returns 2 - hpkg is installed in /boot/home/config/packages
+//returns 0 - app is not running from a hpkg (perhaps still in development testing?)
+//thanks to bbjimmy for this routine
+#################################################
+	local name$, path$, programname$, attribute$
+	name$="yourprogramname"
+	path$=attribute get$ "",""
+	programname$=path$+"/"+name$
+	attribute$=attribute get$ "",programname$
+	if instr(attribute$, "SYS:PACKAGE_FILE") and instr(path$,"/boot/system") then
+		return 1
+	elseif instr(attribute$, "SYS:PACKAGE_FILE") and instr(path$,"/boot/home/config") then
+		return 2
+	elseif (! instr(attribute$, "SYS:PACKAGE_FILE")) 
+		return 0
+	endif
+end sub
+

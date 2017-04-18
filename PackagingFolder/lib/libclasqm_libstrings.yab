@@ -1,0 +1,742 @@
+//This library dates back to the yabasic era.
+//It is provided here as  a service, but is untested on yab
+
+//Installation: create the directory /boot/home/config/settings/yab and copy or symlink
+//the library there.
+
+// LibStrings V1.5
+// String manipulation library
+// see
+// yabasic -docu
+// for usage.
+// All external functions prefixed with 'STR' for clarity.
+// STRString$, STRReplace$, STRCount, STRJoin$, STRCapitalize$, STRTitle$, STRIsUpper, STRIsLower, STRIsAlNum, STRIsAlpha, STRIsDigit
+// STRIsSpace, STRLjust$, STRRjust$, STRCentre$, STRCentreIn$, STRCenter$, STRCenterIn$, STRStripLeft$, STRStripRight$, STRInsert$, STRGlobInstr, STRGlobRinstr
+// STRDelete$, STRRot13$, STRReverse$
+//
+// All comments welcome.
+//
+// ****
+// STRDelete$
+// Params  :
+// iString$: The string to operate on
+// iWhere  : The position of the character to delete.
+//
+// Notes:
+// Removes the character from the given position in the string and returns the result.
+// ****
+// doc STRDelete$(String, position of character to delete)
+export sub STRDelete$(iString$,iWhere)
+return left$(iString$,iWhere-1)+mid$(iString$,iWhere+1)
+end sub
+// ****
+// STRGlobInstr
+// Params:
+// iString$: The string to search.
+// iItem$  : Item to search for.
+// iPos    : From which char to start looking.
+//
+// Notes.
+// This routine works like the inbuilt instr() function except it accepts wild cards.
+// ****
+doc STRGlobInstr(String, Glob string, Searching from X)
+export sub STRGlobInstr(iString$, iItem$, iPos)
+if iPos=0 then
+   iPos=1
+end if
+iItem$=iItem$+"*"
+repeat
+   // print mid$(iString$, iPos)
+   if glob(mid$(iString$, iPos), iItem$) then
+      return iPos // Ugly :-(
+   end if
+   iPos=iPos+1
+until(iPos>len(iString$))
+return 0
+end sub
+// ****
+// STRGlobRinstr
+// Params:
+// iString$: The string to search.
+// iItem$  : Item to search for.
+// iPos    : From which char to start looking.
+//
+// Notes.
+// This routine works like the inbuilt rinstr() function except it accepts wild cards.
+// ****
+doc STRGlobRinstr(String, Glob string, Searching from X)
+export sub STRGlobRinstr(iString$, iItem$, iPos)
+if iPos=0 then
+   iPos=len(iString$)
+end if
+iItem$=iItem$+"*"
+repeat
+   // print mid$(iString$, iPos)
+   if glob(mid$(iString$, iPos), iItem$) then
+      return iPos // Ugly :-(
+   end if
+   iPos=iPos-1
+until(iPos=0)
+return 0
+end sub
+// ****
+// STRInsert$
+// Params:
+// iString$: String
+// iInsert$: String to be inserted into iString$
+// iWhere  : Where iInsert$ should be placed in iString$.
+//
+// Notes:
+// STRInsert$("ABC", "1" ,2) will place "1" after "B" ie STRInsert$("ABC", "1" ,2) = "AB1C"
+// ****
+doc STRInsert$(String, String to insert$, Where to insert string)
+export sub STRInsert$(iString$, iInsert$, iWhere)
+return left$(iString$, iWhere) + iInsert$ + mid$(iString$, iWhere + 1)
+end sub
+// ****
+// STRString$
+// Params:
+// iString$: Char or chars to build string
+// iTimes  : Number of times iString$ is used to build the string
+//
+// Local Vars:
+// iCounter: Loop counter
+// iNew$   : The new string
+//
+// Returns:
+// The new string
+// ****
+doc STRString$(String, times to repeat "string")
+export sub STRString$(iString$, iTimes)
+local iCounter
+local iNew$
+for iCounter = 1 to iTimes
+	iNew$ = iNew$ + iString$
+next iCounter
+return iNew$
+end sub
+/// ****
+// Replace
+// Params:
+// iString$ : String which will have
+// iFind$   : the chars in iFind$
+// iReplace$: replaced with iReplacement$
+// iTimes   : Number of replacements to be made (not obligatory)
+//
+// Local Vars:
+// iN        : Position of iFind$ in iString$
+// iCount    : Counts loop iterations until iTimes is reached
+//
+// Returns:
+// A new string with all matches of iFind$ replaced with iReplacement$
+// Case insensitive
+// ****
+doc STRReplace$(String, string to find, string to replace, number of replacements to be made)
+export sub STRReplace$(iString$, iFind$, iReplace$, iTime)
+local iCount, iN, iStart
+iN = instr(upper$(iString$), upper$(iFind$))
+iCount = 1
+while(iN <> 0)
+    iString$ = left$(iString$, iN - 1) + iReplace$ + right$(iString$, len(iString$) - iN - len(iFind$) + 1)
+    iStart = iN + len(iReplace$)
+    if iStart <= len(iString$) then
+        iN = instr(upper$(iString$), upper$(iFind$), iStart)
+    else
+        iN = 0
+    end if
+    if iTime>0 then
+  		iN=0
+    end if
+wend
+return iString$
+end sub
+// ****
+// STRCount
+// Params:
+// iString    :
+// iChar$     : Character(s) to find and count in iString$
+// iCaseSensitive: Sets case sensitivity. False = Case sensitive. True = Case insensitive.
+//
+// Local Vars:
+// iPos  : Position in iString of iChar$
+// iCount: Number of occurances of iChar$ in iString$
+//
+// Returns the number of times iChar$ is found in iString$
+// ****
+doc STRCount(String, Search Char(s), Ignore case: Boolean)
+export sub STRCount(iString$, iChar$, iCaseSensitive)
+local iCount, iPos
+do
+	if iCaseSensitive = false then
+		iPos = instr(lower$(iString$), lower$(iChar$), iPos + 1)
+	else
+		iPos = instr(iString$, iChar$, iPos + 1)
+	end if
+	if iPos = 0 then
+		break
+	end if
+	iCount = iCount + 1
+loop
+return iCount
+end sub
+// ****
+// STRJoin$()
+// Params:
+// iArray$(): One dimensional string array
+// iDelim$  : Character(s) to delimit array elements in string
+//
+// Local Vars
+// iNew$ : New string made from array
+// iCount: Loop counter
+// iSize : Size of array
+//
+// Notes:
+// Puts the contents of a one dimensional array into a single string
+//
+doc STRJoin$(Array reference, delimiter)
+export sub STRJoin$(iArray$(), iDelim$)
+local iSize
+local iNew$
+iSize = arraysize(iArray$(), 1)
+for iCount = 1 to iSize
+	iNew$ = iNew$ + iArray$(iCount) +  iDelim$
+next iCount
+iNew$ = STRStripRight$(iNew$, len(iDelim$))
+return iNew$
+end sub
+// ****
+// STRCapitalize$()
+// Params:
+// iSentance$: Sentance to be capitalized."
+//
+// Returns:
+// capitalised sentance.
+// ****
+doc STRCapitalize$(Sentance to capitalize)
+export sub STRCapitalize$(iSentance$)
+local iPos
+left$(iSentance$, 1) = upper$(iSentance$)
+do
+	iPos = instr(iSentance$, ".", iPos + 1)
+	if iPos = 0 then
+		break
+	end if
+	if mid$(iSentance$, iPos + 1, 1) = " " and mid$(iSentance$, iPos + 2, 1) >= "a" and mid$(iSentance$, iPos + 2, 1) <= "z" then
+		mid$(iSentance$, iPos + 2, 1) = upper$(mid$(iSentance$, iPos + 2, 1))
+	end if
+	if mid$(iSentance$, iPos + 2, 1) >= "a" and mid$(iSentance$, iPos + 2, 1) <= "z" then
+		mid$(iSentance$, iPos + 1, 1) = upper$(mid$(iSentance$, iPos + 1, 1))
+	end if
+loop
+return iSentance$
+end sub
+// ***
+// STRTitle$
+// Param:
+// iString$: string to change
+//
+// Local vars:
+// iCount: Loop control
+// Notes:
+// Turns the first letter of all words into upper case
+// ***
+doc STRTitle$(sentance)
+export sub STRTitle$(iString$)
+local iCount
+left$(iString$, 1) = upper$(left$(iString$, 1))
+for iCount = 2 to len(iString$)
+	if (mid$(iString$, iCount, 1) >= "a" and mid$(iString$, iCount, 1) <= "z") or (mid$(iString$, iCount, 1) >= "A" and mid$(iString$, iCount, 1) <= "Z") then
+		continue
+	end if
+	mid$(iString$, iCount + 1, 1) = upper$(mid$(iString$, iCount + 1, 1))
+next iCount
+return iString$
+end sub
+// ***
+// STRIsUpper
+// params:
+// iString$: atring to check if all chars are upper case
+//
+// Returns:
+// True if all chars are upper case else false.
+doc STRIsUpper(iString$)
+export sub STRIsUpper(iString$)
+if upper$(iString$) = iString$ then
+	return true
+else
+	return false
+end if
+end sub
+// ***
+// STRIsLowper
+// params:
+// iString$: atring to check if all chars are Lower case
+//
+// Returns:
+// True if all chars are lower case else false.
+doc STRIsLower(iString$)
+export sub STRIsLower(iString$)
+if lower$(iString$) = iString$ then
+	return true
+else
+	return false
+end if
+end sub
+// ***
+// STRIsAlNum
+// Params:
+// iString$: string to check
+//
+// Local Vars:
+// iCount: Loop control
+// iFlag : whether string is alphanumeric
+// Returns:
+// True if string only contains alphnumeric chars else false.
+// ***
+doc STRIsAlNum(String)
+export sub STRIsAlNum(iString$)
+local iCount, iFlag
+iFlag = true
+for iCount = 1 to len(iString$)
+	if (lower$(mid$(iString$, iCount, 1)) >= "a" and lower$(mid$(iString$, iCount, 1)) <= "z") or (mid$(iString$, iCount, 1) >= "0" and mid$(iString$, iCount, 1) <= "9") then
+		continue
+	end if
+	iFlag = false
+	break
+next iCount
+return iFlag
+end sub
+// ***
+// STRIsAlpha
+// Params:
+// iString$: String to check
+//
+// Local Vars:
+// iLen   : Length of iString$
+// iCount : Loop counter
+// iLower$: lower case iString$ for ease of programming :)
+// iFlag  : Marks whether or not iString$ is alphabetic
+//
+// Returns True if all chars are alphabetic otherwise false.
+// Notes:
+// Checks if all chars are alphabetic
+// ***
+doc STRIsAlpha(string)
+export sub STRIsAlpha(iString$)
+local iFlag, iFlag.iCount, iLen
+local iLower$
+iLen = len(iString$)
+iLower$ = lower$(iString$)
+for iCount = 1 to iLen
+	if mid$(iLower$, iCount, 1) >= "a" and mid$(iLower$, iCount, 1) <= "z" then
+		iFlag = true
+	else
+		iFlag = false
+		break
+	end if
+next iCount
+return iFlag
+end sub
+// ***
+// STRIsDigit
+// Param:
+// iString$: String to check
+// Local Vars:
+// iLen  : Length of iString$
+// iCount: Loop counter
+// iFlag : Marks whether char is a digit or not.
+// Returns:
+// True if all chars are numeric else false. Does NOT check if string is calculation eg. "12^2" or "1+1".
+// Notes:
+// Checks if all chars are numeric
+// ***
+doc STRIsDigit(String)
+export sub STRIsDigit(iString$)
+local iCount, iFlag, iLen
+iLen = len(iString$)
+for iCount = 1 to iLen
+	if mid$(iString$, iCount, 1) >= "0" and mid$(iString$, iCount, 1) <= "9" then
+		iFlag = true
+	else
+		iFlag = false
+		break
+	end if
+next iCount
+return iFlag
+end sub
+// ***
+// STRIsSpace
+// Params:
+// iString$: String to check
+//
+// Local Vars:
+// iLen: Length of iString$
+// Returns:
+// True if string is only white space.
+//
+// Notes:
+// White space is defined as just spaces. Tab and Enter are not included.
+// ***
+doc STRIsSpace(String)
+export sub STRIsSpace(iString$)
+local iLen
+iLen = len(iString$)
+if iLen = 0 then
+	return false
+end if
+if STRString$(" ", iLen) = iString$ then
+	return true
+else
+	return false
+end if
+end sub
+// ***
+// STRLjust$
+// Params:
+// iString$: string to be justified
+// iSpace  : number of spaces to be added to iString$
+//
+// Returns:
+// a string with iSpace number of spaces at start of iString$
+// ***
+doc STRLjust$(String, Number of spaces to be added to start of string.)
+export sub STRLjust$(iString$, iSpace)
+return STRSting$(" ", iSpace) + iString$
+end sub
+// ***
+// STRRjust$
+// Params:
+// iString$: string to be justified
+// iSpace  : number of spaces to be added to iString$
+//
+// Returns:
+// a string with iSpace number of spaces at end of iString$
+// ***
+doc STRRjust$(String, Number of spaces to be added to start of string.)
+export sub STRRjust$(iString$, iSpace)
+return iString$ + STRString$(" ", iSpace)
+end sub
+// ***
+// STRCentre
+// Params:
+// iString$: string to be centred.
+// iSpace  : number of spaces to wrap around iString$
+//
+// Local Vars:
+// iLen: Length of iString$ divided by two
+//
+// Returns iString$ with iSpace spaces either side.
+// ***
+doc STRCentre$(String, Spaces)
+export sub STRCentre$(iString$, iSpace)
+local iLen
+if iSpace = 0 then
+	return iString$
+end if
+return STRString$(" ", iSpace) + iString$ + STRString$(" ", iSpace)
+end sub
+// ***
+// STRCentreIn$
+// Params:
+// iString$: string to be centred.
+// iSpace  : number of spaces to place iString$ in.
+//
+// Local Vars:
+// iLen   : length of iString$
+// iSpace$: a string consisting of iSpace spaces
+//
+// Returns:
+// A string centred within a string of spaces.
+// ***
+doc STRCentreIn$(String, Spaces)
+export sub STRCentreIn$(iString$, iSpace)
+local iLen
+local iSpace$
+iLen = len(iString$)
+iSpace$ = STRString$(" ", iSpace)
+mid$(iSpace$, ((iSpace / 2) - (iLen / 2)) + 1, iLen) = iString$
+return iSpace$
+end sub
+// ***
+// STRStripRight
+// Params:
+// iString$: String
+// iChars  : Number of chars to remove from the end of iString
+//
+// Returns:
+// iString minus iChars characters removed from the right. No error checking is done so if iChars > iString$ expect nothing back in return.
+// ***
+doc STRStripRight$(String$, number of chars to remove from the end of String)
+export sub STRStripRight$(iString$, iChars)
+return left$(iString$, len(iString$) - iChars)
+end sub
+// ***
+// STRStripLeft
+// Params:
+// iString$: String
+// iChars  : Number of chars to remove from the start of iString
+//
+// Returns:
+// iString minus iChars characters removed from the left. No error checking is done so if iChars > iString$ expect nothing back in return or problems if a minus number is given.
+// ***
+doc STRStripLeft$(String$, number of chars to remove from the start of String)
+export sub STRStripLeft$(iString$, iChars)
+return right$(iString$, len(iString$) - iChars)
+end sub
+// These 2 routines redirect the American spelling of "centre"
+export sub STRCenter$(iString$, iSpace)
+return STRCentre$(iString$, iSpace)
+end sub
+//
+export sub STRCenterIn$(iString$, iSpace)
+return STRCentreIn$(iString$, iSpace)
+end sub
+// ***
+// STRSRot13
+// Params:
+// iTxt$: String
+//
+// Locals :
+// iN     : Loop Counter
+// iChar$ : A single char extracted from iTxt$
+// iRepAsc: The Ascii code of iChar$ + 13
+// Returns:
+// The Rot13 encoding of the string passed to the routine.
+// ***
+doc STRRot13$(String to encode to Rot13)
+export sub STRRot13$(iTxt$)
+local iN,iChar$,iRepAsc
+for iN=1 to len(iTxt$)
+	iChar$=mid$(iTxt$,iN,1)
+	if STRIsAlpha(iTxt$) then
+		iRepAsc=asc(iChar$)+13
+		if asc(iChar$)>=97 then
+			if iRepAsc>122 then
+				iRepAsc=96+(iRepAsc-122)
+			end if
+		else
+			if iRepAsc>90 then
+				iRepAsc=64+(iRepAsc-90)
+			end if
+		end if
+		mid$(iTxt$,iN,1)=chr$(iRepAsc)
+	end if
+next iN
+return iTxt$
+end sub
+// ***
+// STRReverse$
+// Params:
+// iTxt$: String
+//
+// Locals:
+// iN   : Loop Counter
+// iRes$: Stores the result
+// Returns:
+// The reversed string. ie "Derek" results in "kereD"
+// ***
+doc STRReverse$(String to be reversed eg "Derek" > "kereD")
+export sub STRReverse$(iTxt$)
+local iN, iRes$
+for iN=len(iTxt$) to 1 step -1
+	iRes$=iRes$+mid$(iTxt$,iN,1)
+next iN
+return iRes$
+end sub
+docu
+docu The following routines were written by E.K. Virtanen.
+docu LICENCE: Public Domain (http://creativecommons.org/licenses/publicdomain/)
+docu AUTHOR: E.K.Virtanen http://e-k-v.wikidot.com/ asciiworld@gmail.com
+docu
+// Extended INSRT() functions for yabasic, that uberneat basic interpreter.
+// Now go and see more about it at http://forum.basicprogramming.org/index.php/board,25.0.html
+//
+// INTERPRETER: yabasic 2.x
+// DATE: 26'th August 2009
+// LICENCE: Public Domain (http://creativecommons.org/licenses/publicdomain/)
+// AUTHOR: E.K.Virtanen http://e-k-v.wikidot.com/ asciiworld@gmail.com
+// DESCRIPTIONS: See http://e-k-v.wikidot.com/snippets:minstr-yabasic for details.
+//
+// My little extended library for yabasic; http://forum.basicprogramming.org/index.php/board,25.0.html
+//
+// INTERPRETER: yabasic 2.x
+// DATE: 16'th September 2009
+// LICENCE: Public Domain (http://creativecommons.org/licenses/publicdomain/)
+// AUTHOR: E.K.Virtanen http://e-k-v.wikidot.com/ asciiworld@gmail.com
+// =============================================================================
+//
+//
+//
+// STRMinstr
+// Params    :
+// from$     : Text to search
+// what$     : What to look for
+// sPoint    : Where to start looking.
+//
+// Locals    :
+// i         : Loop counter
+// len_first : Length of from$
+// len_second: Length of what$
+// returnVal : Self explanatory
+// t         : temp position in from$
+//
+// Returns:
+// The position of the first occurance of one of the chars in what$ in the
+// string from$
+//
+docu STRMinstr(text$ to search, what$ to look for, where to start looking)
+export sub STRMinstr(from$, what$, sPoint)
+	local i, len_first, len_second, returnVal, t
+
+	len_first = len(from$)
+	len_second = len(what$)
+
+	// Ok, at first we check out there is no empty strings.
+	if len_first = false then
+		return - 1
+	elseif len_second = false then
+		return - 2
+	elseif sPoint > len_first then
+		return - 3
+	else
+		returnVal = len(from$) + 1
+		if sPoint = 0 then
+			sPoint = 1
+		endif
+	
+		for i = 1 to len(what$)
+			t = instr(from$, mid$(what$, i, 1), sPoint)
+			if t > 0 and t < returnVal then
+				returnVal = t
+			endif
+		next i
+
+		if returnVal > len_first then
+			returnVal = 0
+		endif
+	endif
+	return returnVal
+end sub
+//
+//
+//
+// STRRminstr
+// Params    :
+// from$     : Text to search
+// what$     : What to look for
+// sPoint    : Where to start looking.
+//
+// Locals    :
+// i         : Loop counter
+// len_first : Length of from$
+// len_second: Length of what$
+// returnVal : Self explanatory
+// t         : temp position in from$
+//
+// Returns:
+// The position of the final occurance of one of the chars in what$ in the
+// string from$
+//
+docu STRRminstr(text$ to search, what$ to look for, where to start looking)
+export sub STRRminstr(from$, what$, sPoint)
+	local i, len_first, len_second, returnVal, t
+
+	len_first = len(from$)
+	len_second = len(what$)
+
+	// Ok, at first we check out there is no empty strings.
+	if len_first = false then
+		return - 1
+	elseif len_second = false then
+		return - 2
+	elseif sPoint > len_first then
+		return - 3
+	else
+		returnVal = len(from$) + 1
+		if sPoint = 0 then
+			sPoint = len_first
+		endif
+	
+	for i = len_second to 1 step - 1
+			t = rinstr(from$, mid$(what$, i, 1), sPoint)
+			if t > 0 and t < returnVal then
+				returnVal = t
+			endif
+		next i
+	endif
+
+	if returnVal > len_first then
+		returnVal = 0
+	endif
+	return returnVal
+end sub
+//
+//
+//
+// STRMinstrs
+// Params    :
+// from$     : Text to search
+// what$     : What to look for
+// sPoint    : Where to start looking.
+//
+// Locals    :
+// i         : Loop counter
+// len_first : Length of from$
+// len_second: Length of what$
+// returnVal : Self explanatory
+// t         : temp position in from$
+//
+// Returns:
+// Counts the number of times each char in what$ occurs in from$
+//
+docu STRMinstrs(text$ to search, what$ to look for, where to start looking)
+export sub STRMinstrs(from$, what$, sPoint)
+	local i, len_first, len_second, returnVal, t
+
+	len_first = len(from$)
+	len_second = len(what$)
+
+	// Ok, at first we check out there is no empty strings.
+	if len_first = false then
+		return - 1
+	elseif len_second = false then
+		return - 2
+	elseif sPoint > len_first then
+		return - 3
+	else
+		returnVal = 0
+		if sPoint = 0 then
+			sPoint = 1
+		endif
+		from$ = mid$(from$, sPoint)
+
+		for i = 1 to len(from$)
+			if instr(what$, mid$(from$, i, 1)) > false then
+				returnVal = returnVal + 1
+			endif
+		next i
+	endif
+	return returnVal
+
+end sub
+//
+//
+//
+// STRMinstrErr$
+//
+// Params:
+// errNum: Error code
+//
+// Returns the error report associated with the error code.
+docu STRMinstrErr$(Error code to decipher)
+export sub STRMinstrErr$(errNum)
+	if errNum = - 1 then
+		return "First string argument empty."
+	elseif errNum = - 2 then
+		return "Second string argument empty."
+	elseif errNum = - 3
+		return "Starting point for first string argument invalid."
+	else
+		return "Invalid error number."
+	endif
+end sub

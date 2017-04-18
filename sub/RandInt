@@ -1,0 +1,10 @@
+#################################################
+export sub RandInt()
+#returns a random integer between 0 and 32767
+#devised at a time when yab's own RAN() command was malfunctioning
+#################################################
+	local a
+	a = val(system$("echo $RANDOM"))
+	return a
+end sub
+

@@ -1,0 +1,13 @@
+#################################################
+export sub WhereAmI$()
+//returns the current directory from which the program is running
+//requires yab 2.7.5 or better
+#################################################	local path$
+	path$=attribute get$ "","" 
+	//only works in a bound or compiled version,
+	//hence the fallback if we are running from a script
+	if path$="" path$ = OldWhereAmI$()
+	// I prefer not to add the trailing slash at this point
+	return path$
+end sub
+

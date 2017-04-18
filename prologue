@@ -1,0 +1,31 @@
+//libclasqm main library
+//by Michel Clasquin-Johnson
+//clasqm@gmail.com
+//Public Domain software 2016
+
+//various routines that I use a lot. This library will likely become a prerequisite to compile my programs.
+
+//This is just a beginning. Please help make this a community project by sending me
+//ideas for other commands that can be included.
+
+//Installation: create the directory /boot/home/config/settings/yab and copy or symlink
+//the library there. The packaging system should actually have done this for you.
+
+//Usage: from within yab, use 
+//IMPORT libclasqm_main
+//Now you can use the routines below  like yab had always known about them
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//CONTENTS:
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// WhereAmI$() :returns the current directory from which the program is running
+// OldWhereAmI$(): works with older versions of yab, or use as fallback
+// HPKGStatus(): report app's status in the Haiku packaging system
+// FileExists(fullpathname$): test if a file exists
+// RandInt(): returns a random integer between 0 and 32767
+// RandInt0To9(): returns a random integer between 0 and 9, inclusive
+// StripLFoffSysCmd$(): remove LF from the results of a system call
+// TempDir$(): returns the location of Haiku's TMP directory
+//FileorDir(): tests whether a passed pathname is a file or a directory
+//FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+

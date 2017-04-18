@@ -1,0 +1,18 @@
+#################################################
+export sub FileorLink(pathname$)
+#determines if a passed filename is a file/directory or a symlink
+#returns 1 if the passed variable is a link
+#returns 0 if it is a file/directory
+#################################################
+	local isalink
+	isalink = not system("test -L '" + pathname$ + "'")
+	switch isalink
+		case 1
+			return isalink
+			break
+		default
+			return 0
+			break
+		end switch
+end sub
+
