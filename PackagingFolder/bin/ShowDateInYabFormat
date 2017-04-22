@@ -1,0 +1,4 @@
+#!/bin/sh
+//Doesn't bash have a date command of its own? 
+//It does but yab gives the date in a different format, which you may like better.
+yab -execute "print date$"

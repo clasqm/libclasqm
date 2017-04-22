@@ -1,0 +1,62 @@
+//This library dates back to the yabasic era.
+//It is provided here as  a service, but is untested on yab
+
+//Installation: create the directory /boot/home/config/settings/yab and copy or symlink
+//the library there.
+
+docu graph.yab ,  Library with Graphics related routines, Oct 16, 1999
+docu programmed by Hermang Mansilla, E-mail: hmansilla@usa.net
+docu Tested with Yabasic version 2.58r3
+docu plot(mode,x,y), if mode=0 translates point x,y else draws line to x,y 
+docu markpoint(x,y) draws a "x" mark at the given screen coordinate,
+docu     size of mark depends on eps, so assign a value to graph.eps 
+docu FitCurve(n,N) uses the B-Spline method for tracing a smooth curve
+docu               around a given set of points in arrays x(), y()
+
+export sub plot(m,x,y)
+static lx,ly
+if m=0 then
+	lx=x : ly=y
+else
+	line lx,ly to x,y
+	lx=x : ly=y
+fi
+end sub
+
+rem the size of the "x" mark depends on variable eps
+export sub MarkPoint(x,y)
+plot(0,x-eps,y-eps) : plot(1,x+eps,y+eps)
+plot(0,x+eps,y-eps) : plot(1,x-eps,y+eps)
+end sub
+
+rem B-spline method for tracing smooth curves
+export sub FitCurve( n, N, x(), y() )
+rem n=number of points, N=steps for smoothing the curve
+local first, i,j,t, xA,yA, xB,yB, xC,yC, xD,yD
+local a3,b3, a2,b2, a1,b1, a0,b0, X,Y
+first=1 : rem flag to signal if it is the first point
+for i=1 to n-2
+  xA=x(i-1) : yA=y(i-1)
+  xB=x(i)   : yB=y(i)
+  xC=x(i+1) : yC=y(i+1)
+  xD=x(i+2) : yD=y(i+2)
+  a3=(-xA+3*(xB-xC)+xD)/6
+  b3=(-yA+3*(yB-yC)+yD)/6
+  a2=(xA-2*xB+xC)/2
+  b2=(yA-2*yB+yC)/2
+  a1=(xC-xA)/2
+  b1=(yC-yA)/2
+  a0=(xA+4*xB+xC)/6
+  b0=(yA+4*yB+yC)/6
+	for j=0 to N
+	t=j/N
+	X=((a3*t+a2)*t+a1)*t+a0
+	Y=((b3*t+b2)*t+b1)*t+b0
+	if (first=1) then
+		first=0
+		plot(0,X,Y)
+	else	plot(1,X,Y)
+	fi
+	next j
+next i
+end sub

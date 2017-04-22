@@ -1,0 +1,35 @@
+name				libclasqm
+version				1.1-2
+architecture			any
+
+summary			"Libraries for yab programmers"
+Description			"A variety of libraries, some written by me for yab, others dating back to the yabasic era and rescued before they disappear. Please see the README for details.
+
+The libraries that were not written by me do not always have the original authors indicated, but the fact that they were published in plain text on the web long before we all became obsessed with licensing is taken to mean that Public Domain licensing was intended. If any library or routine presented here is yours and you object to its inclusion, please inform me and I will remove it from the bundle.
+
+This HPKG also contains a few standalone CLI utilities, mostly to give system info, written in yab.
+"
+
+packager			"Michel Clasquin-Johnson <clasqm@gmail.com>"
+vendor				"clasqm"
+copyrights			"Michel Clasquin-Johnson <clasqm@gmail.com>"
+licenses				"Public Domain"
+provides {
+					libclasqm = 1.1-2
+					lib:libclasqm_main
+					lib:libclasqm_compat
+					cmd:ShowDesktopWidth
+					cmd:ShowDesktopHeight
+					cmd:ShowDeskbarPosition
+					cmd:ShowDateInYabFormat
+}
+requires {
+					cmd:yab
+}
+post-install-scripts {
+					boot/post-install/post_libclasqm
+}
+URLs {
+					http://clasquin-johnson.co.za/michel/haiku
+}
+

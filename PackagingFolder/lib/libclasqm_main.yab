@@ -1,0 +1,265 @@
+//libclasqm main library
+//by Michel Clasquin-Johnson
+//clasqm@gmail.com
+//Public Domain software 2016
+
+//various routines that I use a lot. This library will likely become a prerequisite to compile my programs.
+
+//This is just a beginning. Please help make this a community project by sending me
+//ideas for other commands that can be included.
+
+//Installation: create the directory /boot/home/config/settings/yab and copy or symlink
+//the library there. The packaging system should actually have done this for you.
+
+//Usage: from within yab, use 
+//IMPORT libclasqm_main
+//Now you can use the routines below  like yab had always known about them
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//CONTENTS:
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// WhereAmI$() :returns the current directory from which the program is running
+// OldWhereAmI$(): works with older versions of yab, or use as fallback
+// HPKGStatus(): report app's status in the Haiku packaging system
+// FileExists(fullpathname$): test if a file exists
+// RandInt(): returns a random integer between 0 and 32767
+// RandInt0To9(): returns a random integer between 0 and 9, inclusive
+// StripLFoffSysCmd$(): remove LF from the results of a system call
+// TempDir$(): returns the location of Haiku's TMP directory
+//FileorDir(): tests whether a passed pathname is a file or a directory
+//FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+
+//no main loop in a library, but if there was one, it would be here
+#################################################
+export sub FileExists(fullpathname$)
+//test if a file exists
+//returns 1 - file exists
+//returns 0 - file does not exist
+#################################################
+	local handle
+	handle = open(fullpathname$,"r")
+	if handle then
+		close handle
+		return 1
+	else
+		return 0
+	endif
+end sub
+
+#################################################
+export sub FileorDir(pathname$)
+#determines if a passed filename is a file or a directory
+#returns 1 if the passed variable is a directory
+#returns 0 if it is a file
+#################################################
+	local isadir
+	isadir = not system("test -d '" + pathname$ + "'")
+	switch isadir
+		case 1
+			return isadir
+			break
+		default
+			return 0
+			break
+		end switch
+end sub
+
+#################################################
+export sub FileorLink(pathname$)
+#determines if a passed filename is a file/directory or a symlink
+#returns 1 if the passed variable is a link
+#returns 0 if it is a file/directory
+#################################################
+	local isalink
+	isalink = not system("test -L '" + pathname$ + "'")
+	switch isalink
+		case 1
+			return isalink
+			break
+		default
+			return 0
+			break
+		end switch
+end sub
+
+#################################################
+export sub HPKGStatus()
+//report app's status in the Haiku packaging system
+//returns 1 - hpkg is installed in /boot/system/packages
+//returns 2 - hpkg is installed in /boot/home/config/packages
+//returns 0 - app is not running from a hpkg (perhaps still in development testing?)
+//thanks to bbjimmy for this routine
+#################################################
+	local name$, path$, programname$, attribute$
+	name$="yourprogramname"
+	path$=attribute get$ "",""
+	programname$=path$+"/"+name$
+	attribute$=attribute get$ "",programname$
+	if instr(attribute$, "SYS:PACKAGE_FILE") and instr(path$,"/boot/system") then
+		return 1
+	elseif instr(attribute$, "SYS:PACKAGE_FILE") and instr(path$,"/boot/home/config") then
+		return 2
+	elseif (! instr(attribute$, "SYS:PACKAGE_FILE")) 
+		return 0
+	endif
+end sub
+
+#################################################
+export sub IsFileZeroByte(pathname$)
+#determines if a passed filename is a zero-byte file
+#returns 1 if the passed variable is larger than zero bytes
+#returns 0 if it is zero bytes in size
+#caution: will also retun 0 if file does not exist
+#test for that with FileExists first
+#caution: will also return 1 if file is actually a directory
+#test for that with FileorDir first
+#caution: If the file given is a symlink, this routine will report on the real, linked file
+#################################################
+	local isazero
+	isazero = not system("test -s '" + pathname$ + "'")
+	switch isazero
+		case 1
+			return isazero
+			break
+		default
+			return 0
+			break
+		end switch
+end sub
+
+#################################################
+export sub OldWhereAmI$()
+//works with older versions of yab, or use as fallback
+#################################################
+	local path$, catch, x
+	catch=0
+	if (peek("isbound")) then
+  		path$=peek$("directory")
+	else
+		path$=system$("pwd")
+	endif
+	 path$ = StripLFoffSysCmd$(path$)
+	 // I prefer not to add the trailing slash at this point
+	return path$
+end sub
+
+#################################################
+export sub RandInt()
+#returns a random integer between 0 and 32767
+#devised at a time when yab's own RAN() command was malfunctioning
+#################################################
+	local a
+	a = val(system$("echo $RANDOM"))
+	return a
+end sub
+
+#################################################
+export sub RandInt0To9()
+#returns a random integer between 0 and 9, inclusive
+#devised at a time when yab's own RAN() command was malfunctioning
+#################################################
+	local a
+	a=val(mid$(time$, 8,1))
+	return a
+end sub
+
+#################################################
+export sub StripLFoffSysCmd$(tempval$)
+//remove LF from the results of a system call
+//if the results of a System() or System$() command end on a LF (most do),
+//strip the LF off and return the resulting string
+#################################################
+	if instr(tempval$, "\n", len(tempval$)) <> 0 then //if the string ends with a LF
+		tempval$ = left$(tempval$, len(tempval$)-1) //strip off trailing newline
+	endif
+	return tempval$
+end sub
+
+#################################################
+export sub TempDir$()
+//returns the location of Haiku's TMP directory
+//note: no traling "/"
+//The Haiku devs are fond of moving this location around, so you shouldn't
+//reference it directly, rather use this routine
+#################################################
+	local tempdir$
+	tempdir$ = system$("finddir B_COMMON_TEMP_DIRECTORY") 
+	tempdir$ = StripLFoffSysCmd$(tempdir$) //strip off trailing newline
+	return tempdir$
+end sub
+
+#################################################
+export sub WhereAmI$()
+//returns the current directory from which the program is running
+//requires yab 2.7.5 or better
+#################################################	local path$
+	path$=attribute get$ "","" 
+	//only works in a bound or compiled version,
+	//hence the fallback if we are running from a script
+	if path$="" path$ = OldWhereAmI$()
+	// I prefer not to add the trailing slash at this point
+	return path$
+end sub
+
+########################################
+#Library Test suite for libclasqm_main
+#past the lines below into a new yab file and remove the 
+//remarks to test these routines.
+########################################
+
+//#!/bin/env yab
+//import libclasqm_main
+//system("clear")
+//
+//print "Testing FileExists."
+//if (FileExists("/boot/home/projects/libclasqm/binder/libclasqm.yab")) then
+//	print "Yes, that file is on your system."
+//else
+//	print"Sorry, bub, that file is not found."
+//endif
+//print
+//print "Testing HPKGStatus."
+//if HPKGStatus() = 1 then
+//	print "Running from system, are we?"
+//elseif HPKGStatus() = 2 then
+//	print "Oooh, running from the home folder!"
+//else
+//	print "Go ahead and package this sucker!"
+//endif
+//print
+//print "Testing WhereAmI$ and OldWhereAmI$."
+//print "the working directory is " + WhereAmI$() + "."
+//print "or as we used to calculate it, " + OldWhereAmI$() + "."
+//print
+//print "Testing RandInt."
+//Print "Here's a large random number: " + str$(RandInt()) + "."
+//print
+//print "Testing RandInt0To9."
+//Print "Here's a small random number: " + str$(RandInt0To9()) + "."
+//print
+//print "Testing StripLFoffSysCmd$"
+//print "The yab executable is located at " + StripLFoffSysCmd$(system$("which yab")) + ". Note that we've removed the line feed."
+//print
+//print "Testing TempDir$"
+//Print " The TMP directory is at " + TempDir$() + "."
+//print "testing FileorDir, FileorLink and IsFileZeroByte"
+//a$ = "/boot/system/non-packaged"
+//#change this variable to something else to test different kinds of files
+//#links and directories
+//print "using " + a$
+//if (FileorDir(a$)) then
+//	print "It's a directory!"
+//else
+//	print "it looks like a file ..."
+//endif 
+//if not (FileorLink(a$)) then
+//	print "and it looks real, not a symbolic link."
+//else
+//	print "it's a link!"
+//endif
+//if (IsFileZeroByte(a$)) then
+//	print "it is larger than zero bytes"
+//else
+//	print "it is a zero-byte file"
+//endif
+
