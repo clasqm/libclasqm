@@ -1,5 +1,5 @@
 name				libclasqm
-version				1.1-2
+version				1.2-2
 architecture			any
 
 summary			"Libraries for yab programmers"
@@ -15,7 +15,7 @@ vendor				"clasqm"
 copyrights			"Michel Clasquin-Johnson <clasqm@gmail.com>"
 licenses				"Public Domain"
 provides {
-					libclasqm = 1.1-2
+					libclasqm = 1.2-2
 					lib:libclasqm_main
 					lib:libclasqm_compat
 					cmd:ShowDesktopWidth
@@ -32,4 +32,6 @@ post-install-scripts {
 URLs {
 					http://clasquin-johnson.co.za/michel/haiku
 }
-
+source-urls {
+					https://github.com/clasqm/libclasqm
+}

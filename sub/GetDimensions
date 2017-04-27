@@ -1,0 +1,18 @@
+#################################################
+export sub GetDimensions(dimension$, WindowID$)
+#Find the width or height of a Window
+#dimension$ must be "x" or "y"
+#################################################
+	switch dimension$
+		case "x"
+			return Window get WindowID$, "width"
+			break
+		case "y"
+			return Window get WindowID$, "height"
+			break
+		default
+			return 0
+		break
+	end switch
+end sub
+

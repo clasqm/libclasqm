@@ -26,6 +26,7 @@
 // RandInt0To9(): returns a random integer between 0 and 9, inclusive
 // StripLFoffSysCmd$(): remove LF from the results of a system call
 // TempDir$(): returns the location of Haiku's TMP directory
-//FileorDir(): tests whether a passed pathname is a file or a directory
-//FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+// FileorDir(): tests whether a passed pathname is a file or a directory
+// FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+// GetDimensions: find the x or y dimensions of a window
 

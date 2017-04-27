@@ -26,10 +26,12 @@
 // RandInt0To9(): returns a random integer between 0 and 9, inclusive
 // StripLFoffSysCmd$(): remove LF from the results of a system call
 // TempDir$(): returns the location of Haiku's TMP directory
-//FileorDir(): tests whether a passed pathname is a file or a directory
-//FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+// FileorDir(): tests whether a passed pathname is a file or a directory
+// FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+// GetDimensions: find the x or y dimensions of a window
 
 //no main loop in a library, but if there was one, it would be here
+
 #################################################
 export sub FileExists(fullpathname$)
 //test if a file exists
@@ -80,6 +82,24 @@ export sub FileorLink(pathname$)
 			return 0
 			break
 		end switch
+end sub
+
+#################################################
+export sub GetDimensions(dimension$, WindowID$)
+#Find the width or height of a Window
+#dimension$ must be "x" or "y"
+#################################################
+	switch dimension$
+		case "x"
+			return Window get WindowID$, "width"
+			break
+		case "y"
+			return Window get WindowID$, "height"
+			break
+		default
+			return 0
+		break
+	end switch
 end sub
 
 #################################################
