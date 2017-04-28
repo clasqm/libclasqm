@@ -59,4 +59,13 @@
 //else
 //	print "it is a zero-byte file"
 //endif
+//a$ = WorkspaceCurrent$()
+//print "There are " + WorkspaceTotal$() + " workspaces on this system."
+//print "This is workspace " + a$
+//print "Switching to workspace 1 in 3 seconds." 
+//print "then back to this one after 3 seconds."
+//wait 3
+//WorkspaceSwitch(1)
+//wait 3
+//WorkspaceSwitch$(a$)
 

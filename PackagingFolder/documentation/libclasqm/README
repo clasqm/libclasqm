@@ -5,6 +5,22 @@ Clasqm's libraries for yab
 The following are libraries I have written:
 
 libclasqm_main: a variety of yab routines
+Routines: 
+// WhereAmI$() :returns the current directory from which the program is running
+// OldWhereAmI$(): works with older versions of yab, or use as fallback
+// HPKGStatus(): report app's status in the Haiku packaging system
+// FileExists(fullpathname$): test if a file exists
+// RandInt(): returns a random integer between 0 and 32767
+// RandInt0To9(): returns a random integer between 0 and 9, inclusive
+// StripLFoffSysCmd$(): remove LF from the results of a system call
+// TempDir$(): returns the location of Haiku's TMP directory
+// FileorDir(): tests whether a passed pathname is a file or a directory
+// FileorLink(): tests whether a passed pathname is a file/directory or a symlink
+// GetDimensions: find the x or y dimensions of a window
+// WorkspaceCurrent$: find the current workspace
+// WorkspaceTotal$: find the total number of workspaces on a system
+// WorkspaceSwitch, WorkspaceSwitch$: switch to a specific workspace
+
 libclasqm_compat: routines that mimic features or variations found in other forms of BASIC
 
 These libraries are linked to /boot/home/config/settings/yab by the packaging system.
@@ -38,8 +54,16 @@ libclasqm_libbits - miscelaneous routines
 #########About the utilities#########
 
 The following CLI utlities are included in this HPKG:
-ShowDesktopWidth
-ShowDesktopHeight
-ShowDeskbarPosition
 ShowDateInYabFormat
+ShowDeskbarExpanded
+ShowDeskbarHeight
+ShowDeskbarPosition
+ShowDeskbarWidth
+ShowDeskbarX
+ShowDeskbarY
+ShowDesktopHeight
+ShowDesktopWidth
+ShowScrollbarWidth
+ShowTabHeight
+
  

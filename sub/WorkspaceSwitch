@@ -1,0 +1,13 @@
+#################################################
+export sub WorkspaceSwitch(space)
+//Switch to a given WorkSpace
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//This can be done with Haiku's own WorkSpaces GUI app as well, but that one
+//counts from 0 onwards. This routine starts with a more BASIC-like 1.
+//Usage: WorkspaceSwitch(space)
+//where space is the number of the workspace to which you want to switch
+//starting with 1 for workspace one and so on
+#################################################
+	system("workspace set " + str$(space))
+end sub
+

@@ -1,0 +1,11 @@
+#################################################
+export sub WorkspaceTotal$()
+//Get the total number of workspaces on a system
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//returns a STRING value - use VAL to convert to a number
+#################################################
+	local spaces$
+	spaces$ = StripLFoffSysCmd$(system$("workspace count"))
+	return spaces$
+end sub
+

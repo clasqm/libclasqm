@@ -3,7 +3,7 @@ cd /boot/home/projects/libclasqm/PackagingFolder
 cp -f ~/projects/libclasqm/binder/libclasqm.yab ~/projects/libclasqm/PackagingFolder/lib/libclasqm_main.yab
 package create -b libclasqm_1.2-2_any.hpkg
 sleep 0.5
-package add libclasqm_1.2-2_any.hpkg boot documentation lib data bin
+package add libclasqm_1.2-2_any.hpkg boot documentation lib bin
 sleep 0.5
 addattr BeShare:Info "Libraries for yab programmers" libclasqm_1.2-2_any.hpkg
 cp libclasqm_1.2-2_any.hpkg "/Storage/Haiku/My ports"

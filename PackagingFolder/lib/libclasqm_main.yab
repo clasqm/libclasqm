@@ -29,6 +29,9 @@
 // FileorDir(): tests whether a passed pathname is a file or a directory
 // FileorLink(): tests whether a passed pathname is a file/directory or a symlink
 // GetDimensions: find the x or y dimensions of a window
+// WorkspaceCurrent$: find the current workspace
+// WorkspaceTotal$: find the total number of workspaces on a system
+// WorkspaceSwitch, WorkspaceSwitch$: switch to a specific workspace
 
 //no main loop in a library, but if there was one, it would be here
 
@@ -221,6 +224,55 @@ export sub WhereAmI$()
 	return path$
 end sub
 
+#################################################
+export sub WorkspaceCurrent$()
+//Get the current workspace
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//returns a STRING value - use VAL to convert to a number
+#################################################
+	local spaces$
+	spaces$ = StripLFoffSysCmd$(system$("workspace get"))
+	return spaces$
+end sub
+
+#################################################
+export sub WorkspaceSwitch(space)
+//Switch to a given WorkSpace
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//This can be done with Haiku's own WorkSpaces GUI app as well, but that one
+//counts from 0 onwards. This routine starts with a more BASIC-like 1.
+//Usage: WorkspaceSwitch(space)
+//where space is the number of the workspace to which you want to switch
+//starting with 1 for workspace one and so on
+#################################################
+	system("workspace set " + str$(space))
+end sub
+
+#################################################
+export sub WorkspaceSwitch$(space$)
+//Switch to a given WorkSpace
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//This can be done with Haiku's own WorkSpaces GUI app as well, but that one
+//counts from 0 onwards. This routine starts with a more BASIC-like 1.
+//same as the WorkspaceSwitch, but take a string variable instead of a numerical one
+//Usage: WorkspaceSwitch(space$)
+//where space$ is the number of the workspace to which you want to switch, e.g. "1"
+//starting with 1 for workspace one and so on
+#################################################
+	system("workspace set " + space$)
+end sub
+
+#################################################
+export sub WorkspaceTotal$()
+//Get the total number of workspaces on a system
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//returns a STRING value - use VAL to convert to a number
+#################################################
+	local spaces$
+	spaces$ = StripLFoffSysCmd$(system$("workspace count"))
+	return spaces$
+end sub
+
 ########################################
 #Library Test suite for libclasqm_main
 #past the lines below into a new yab file and remove the 
@@ -282,4 +334,13 @@ end sub
 //else
 //	print "it is a zero-byte file"
 //endif
+//a$ = WorkspaceCurrent$()
+//print "There are " + WorkspaceTotal$() + " workspaces on this system."
+//print "This is workspace " + a$
+//print "Switching to workspace 1 in 3 seconds." 
+//print "then back to this one after 3 seconds."
+//wait 3
+//WorkspaceSwitch(1)
+//wait 3
+//WorkspaceSwitch$(a$)
 

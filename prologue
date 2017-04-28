@@ -29,4 +29,7 @@
 // FileorDir(): tests whether a passed pathname is a file or a directory
 // FileorLink(): tests whether a passed pathname is a file/directory or a symlink
 // GetDimensions: find the x or y dimensions of a window
+// WorkspaceCurrent$: find the current workspace
+// WorkspaceTotal$: find the total number of workspaces on a system
+// WorkspaceSwitch, WorkspaceSwitch$: switch to a specific workspace
 

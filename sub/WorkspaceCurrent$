@@ -1,0 +1,11 @@
+#################################################
+export sub WorkspaceCurrent$()
+//Get the current workspace
+//requires the workspace CLI utility to be installed from the clasqm repo.
+//returns a STRING value - use VAL to convert to a number
+#################################################
+	local spaces$
+	spaces$ = StripLFoffSysCmd$(system$("workspace get"))
+	return spaces$
+end sub
+
