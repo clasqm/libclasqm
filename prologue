@@ -3,7 +3,8 @@
 //clasqm@gmail.com
 //Public Domain software 2016
 
-//various routines that I use a lot. This library will likely become a prerequisite to compile my programs.
+//various routines that I use a lot. This library a is prerequisite to compile 
+// or even run many of my programs.
 
 //This is just a beginning. Please help make this a community project by sending me
 //ideas for other commands that can be included.
@@ -32,4 +33,6 @@
 // WorkspaceCurrent$: find the current workspace
 // WorkspaceTotal$: find the total number of workspaces on a system
 // WorkspaceSwitch, WorkspaceSwitch$: switch to a specific workspace
+// ArraySort: sorts a ONE-dimensional numeric array and returns it
+// ArraySort$: sorts a ONE-dimensional string array and returns it
 

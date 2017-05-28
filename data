@@ -1,6 +1,6 @@
 ########################################
 #Library Test suite for libclasqm_main
-#past the lines below into a new yab file and remove the 
+#paste the lines below into a new yab file and remove the 
 //remarks to test these routines.
 ########################################
 
@@ -68,4 +68,16 @@
 //WorkspaceSwitch(1)
 //wait 3
 //WorkspaceSwitch$(a$)
+//
+//dim a$(5)
+//a$(1) = "Tesla"
+//a$(2) = "abcde"
+//a$(3) = "test"
+//a$(5) = "Azerty"
+//a$(4) = "ppppppppppppp"
+//ArraySort$(a$())
+//for f = 1 to 5
+//print a$(f)
+//next f
+//end
 

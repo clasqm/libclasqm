@@ -1,0 +1,27 @@
+#################################################
+export sub ArraySort$(z$())
+//sorts a ONE-dimensional numeric array (case-independent) and returns it
+//Usage: ArraySort$(a$())
+//do not try a$() =  ArraySort$(a$()), it won't work
+#################################################
+	local tempfile1$, tempfile2$,upperlimit, handle, item$
+	tempfile1$ = TempDir$() + str$(RandInt())
+	tempfile2$ = TempDir$() + str$(RandInt())
+	upperlimit =arraysize(z$(),1)
+	handle = open(tempfile1$,"w")
+	for f = 1 to upperlimit
+		print #handle z$(f)
+	next f
+	close handle
+	system("sort -bf " + tempfile1$ + " > " + tempfile2$)
+	handle = open(tempfile2$,"r")
+	for f = 1 to upperlimit
+		line input #handle item$
+		z$(f) = item$
+	next f
+	close handle
+	system("rm " + tempfile1$)
+	system("rm " + tempfile2$)
+	return z$()
+end sub
+
