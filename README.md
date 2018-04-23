@@ -107,4 +107,6 @@ The following CLI utlities are included in this HPKG:
 
 Get it here: https://github.com/clasqm/libclasqm
 
+Binaries: https://sourceforge.net/p/libclasqm/
+
  
